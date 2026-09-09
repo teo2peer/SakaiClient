@@ -14,9 +14,9 @@ Snapshot: **2026-09-09**, current uncommitted working tree on `main`. This recor
 | Current frontend export | `dist/web` rebuilt successfully, including 14 static routes and 187 local PDF support assets. |
 | README screenshots | Responsive fixture navigation, filters, physical download state, resource actions and local PDF rendering passed at 390/1280 px. A synthetic desktop-bridge browser flow verified favorite-first order, alias persistence and controls at 390 px. Mobile captures were regenerated. |
 | Real Electron relaunch | Not established for this change. Two Playwright launches reached Electron's debugger/DevTools endpoints but timed out before the first window attached. The older synthetic desktop PDF image remains; current IPC/storage behavior is covered by Node tests, not this failed runtime attempt. |
-| Native/desktop package rebuilds | Not repeated in this audit, by request. Existing IPA/APK/DMG artifacts predate these changes. |
+| Native/desktop package rebuilds | Hosted CI built current unsigned Android/iOS artifacts and desktop packages for Windows x64, Linux x64 and macOS arm64/x64. Local package rebuilds were not repeated. |
 | Physical-device picker/move/UI validation | Not established. The latest phone installation attempt failed because the target device was unavailable. |
-| Hosted GitHub Actions | Never run at handoff; no configured Git remote was reported. |
+| Hosted GitHub Actions | Current `main` passed validation and all platform packaging jobs in [run 34338925563](https://github.com/teo2peer/SakaiClient/actions/runs/34338925563). Version-tag publication was still pending at this snapshot. |
 
 The checks below validate the current source within their stated boundaries. They do not replace physical-device or packaged-application validation.
 
@@ -64,12 +64,12 @@ These results were reported from earlier tool runs, before the latest relocation
 | Workflow syntax | `actionlint` v1.7.12 passed. | Syntax validation, not a hosted workflow run or successful artifact upload/release. |
 | Workflow action references | Commit SHAs were reviewed/verified in the earlier work. | Not rechecked over the network by this documentation pass. |
 
-Generated native/desktop binaries from those runs are stale relative to this audit. `dist/web` was rebuilt by the current commands above, but signed IPA, APK and DMG artifacts were not. The source, lockfile and scripts are authoritative; the existence of an older binary does not establish that it contains these fixes.
+Locally generated native/desktop binaries from the historical runs are stale relative to this audit. `dist/web` was rebuilt locally, while the hosted `main` run produced current ephemeral unsigned platform artifacts. The source, lockfile and scripts remain authoritative; artifact presence alone does not establish installation or runtime behavior.
 
 ## Unvalidated Boundaries
 
-- Windows and Linux desktop packaging/runtime and macOS x64 were not run locally. Workflow matrix entries do not prove those targets pass.
-- Hosted GitHub validation, runner availability, artifact upload and version-tag publication have not been exercised. There is no released CI result or release URL to cite.
+- Windows and Linux desktop runtime and macOS x64 runtime were not run locally. Hosted packaging passed, but does not prove installed runtime behavior.
+- Hosted validation and artifact upload passed on `main`; version-tag publication had not yet been exercised at this snapshot.
 - The latest actual phone install failed because the device was unavailable. Do not claim the latest native UI, native PDF interaction, system picker or document move was verified on a physical device.
 - Android external providers and iOS folder reauthorization need real-device checks. No persistent iOS bookmark or cross-provider durability guarantee is established.
 - Native background scheduling, download-completion notifications and OS click routing remain OS-dependent; fixture/unit checks do not establish delivery timing.

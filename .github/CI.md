@@ -4,7 +4,7 @@
 
 The configured workflow is [workflows/ci.yml](workflows/ci.yml). It triggers on every branch push, `v*` tag push, pull request, and manual dispatch. Pushes and manual runs build Android, iOS, web, Windows x64, Linux x64, and macOS arm64/x64. Pull requests only export web and run unit tests, lint, and typechecking to limit hosted runner costs. Native and desktop builds depend on successful validation.
 
-**This is a source-level workflow contract, not a successful hosted run.** At the documentation handoff, no Git remote is configured and GitHub Actions has never been run. No repository URL, release URL or hosted build result is implied. The workflow becomes usable only after it is pushed to an actual GitHub repository with Actions enabled. Review runner availability, permissions, usage and CI-minute limits, especially for macOS, before enabling broad push builds.
+This contract is active in the public [teo2peer/SakaiClient](https://github.com/teo2peer/SakaiClient) repository. The current `main` source passed the complete hosted workflow in [run 34338925563](https://github.com/teo2peer/SakaiClient/actions/runs/34338925563), including validation and every documented platform build. Review runner availability, permissions, usage and CI-minute limits, especially for macOS, before changing broad push builds.
 
 Obsolete runs for the same branch or pull request are cancelled. Tag runs are not cancelled by a newer run, and different tags have separate concurrency groups. Only a successful **push of a validated version tag** publishes a GitHub Release; manually dispatching on a tag does not publish.
 
@@ -16,7 +16,7 @@ Obsolete runs for the same branch or pull request are cancelled. Tag runs are no
 - iOS: macOS 26 with `/Applications/Xcode_26.6.app/Contents/Developer`. SDK 57 requires Xcode 26.4 or newer.
 - Desktop: Ubuntu 24.04, Windows 2025, and macOS 26. Both macOS architectures are packaged separately.
 
-All actions are pinned to commit SHAs reviewed/verified in the earlier work; they were not rechecked over the network in this documentation pass. The default token permission is `contents: read`, checkout never persists credentials, and only the tag publishing job has `contents: write`. No private signing material, Expo token, custom GitHub token, or invented repository URL is required. Dependency installation skips the root Electron binary; electron-builder may still download the target Electron runtime while packaging.
+All actions are pinned to commit SHAs reviewed/verified in the earlier work and executed successfully in the hosted `main` run; pin provenance was not independently rechecked during that run. The default token permission is `contents: read`, checkout never persists credentials, and only the tag publishing job has `contents: write`. No private signing material, Expo token or custom GitHub token is required. Dependency installation skips the root Electron binary; electron-builder may still download the target Electron runtime while packaging.
 
 ## Source Contract
 
@@ -71,12 +71,12 @@ The release job downloads `release-*` artifacts into separate subdirectories und
 
 `gh release create --verify-tag --generate-notes` attaches the flat files plus checksums using only the built-in token. Tags with a prerelease suffix use `--prerelease`. The unsigned-build notice is prepended to generated release notes. Existing releases fail explicitly; there is no overwrite, clobber, delete, or automatic tag creation. A failed upload may leave a draft release: inspect it before retrying, and choose recovery deliberately rather than silently replacing assets.
 
-There is no remote configuration in this implementation. The workflow can only be exercised after the repository is independently hosted on GitHub with Actions enabled. It does not create repositories, deploy a hosted website, submit to App Store/TestFlight/Play Store, or configure EAS/OTA/desktop automatic updates. Signing, store submission, native device smoke tests and desktop installation tests remain separate release responsibilities. Attaching an unsigned artifact is not a claim of OS trust or store approval.
+The workflow does not create repositories, deploy a hosted website, submit to App Store/TestFlight/Play Store, or configure EAS/OTA/desktop automatic updates. Signing, store submission, native device smoke tests and desktop installation tests remain separate release responsibilities. Attaching an unsigned artifact is not a claim of OS trust or store approval.
 
 ## Validation Status
 
-The earlier `actionlint` v1.7.12 check passed, and the historical full unit run passed 84 tests before the latest relocation audit changes. Neither is evidence that hosted runners built or published anything. Windows/Linux desktop and macOS x64 were not run locally. The current audit's passing focused checks, frontend export and lint/typecheck results are recorded in [VALIDATION.md](../docs/VALIDATION.md); CI-specific helpers and hosted builds were not rerun in that audit.
+The earlier `actionlint` v1.7.12 check passed. The current hosted `main` run passed 151 Bun tests, lint, typechecking, web export, Android/iOS unsigned builds and desktop packaging for Windows x64, Linux x64 and macOS arm64/x64. Runtime and installation checks were not performed by packaging jobs. Local checks and remaining boundaries are recorded in [VALIDATION.md](../docs/VALIDATION.md).
 
 For workflow/helper changes, the existing `tests/ci.test.js` covers tag/version/run-number validation and release asset flattening/checksums/duplicate rejection without contacting GitHub. Its temporary files use `os.tmpdir()`; select an approved `TMPDIR` when validating locally. `actionlint` and `bash -n scripts/build-ios-ci.sh` are focused syntax checks. The workflow itself builds web before running `bun test`, `bun run lint` and `bun run typecheck`.
 
-Full native/platform packaging and installation validation remains separate. Previously generated artifacts may be stale relative to current source, and no workflow execution or publication is implied by adding or reviewing these files.
+Hosted native/platform packaging now passes for the documented targets. Installation, signing and device/runtime validation remain separate, and version-tag publication had not yet been exercised at this documentation snapshot.

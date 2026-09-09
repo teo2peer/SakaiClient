@@ -119,7 +119,7 @@ The provisioning profile has a fixed App ID. Installing this build can replace a
 
 The CI mobile outputs are explicitly **unsigned**: an APK without a signing configuration and an iOS device IPA using `dev.sakaiclient.unofficial`. Neither is directly installable without appropriate signing. Desktop installers are not code-signed or notarized and may trigger OS trust warnings. CI does not use or upload the private signing files from the local Mac. There is no App Store, TestFlight, Play Store or automatic-update deployment in this workflow.
 
-No Git remote is configured in the handoff state, and hosted GitHub CI has not been run. The workflow becomes usable after the project is pushed to a real GitHub repository with Actions enabled; it creates no remote automatically. Review runner usage and CI-minute limits, especially for the macOS matrix. Details and artifact names are in [.github/CI.md](.github/CI.md); release assets include SHA-256 checksums.
+The project is hosted at [teo2peer/SakaiClient](https://github.com/teo2peer/SakaiClient). The current `main` workflow passed validation and produced all documented platform artifacts on GitHub-hosted runners. Review runner usage and CI-minute limits, especially for the macOS matrix. Details, run evidence and artifact names are in [.github/CI.md](.github/CI.md); tagged release assets include SHA-256 checksums.
 
 Standard validation commands; the exact focused checks executed for the current audit are listed in the validation record:
 

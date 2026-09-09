@@ -109,6 +109,6 @@ The beforePack hook collects notices from the installed renderer dependency tree
 
 ## Validation Boundaries
 
-The current temporary-filesystem and IPC-contract regressions, earlier macOS arm64 DMG build and isolated real-Electron/synthetic checks are recorded separately in [VALIDATION.md](../docs/VALIDATION.md). The latest relocation audit passed under both Bun and Node but did not relaunch Electron or rebuild an installer. Windows/Linux/macOS-x64 runtime support remains untested locally, and hosted CI has never run at handoff.
+The current temporary-filesystem and IPC-contract regressions, earlier isolated real-Electron/synthetic checks and hosted package builds are recorded separately in [VALIDATION.md](../docs/VALIDATION.md). The latest relocation audit passed under both Bun and Node but did not relaunch Electron locally. Hosted CI packaged Windows x64, Linux x64 and macOS arm64/x64 successfully; installed runtime behavior on those outputs remains untested.
 
 After relevant changes, use focused checks for direct/CAS redirects and cookies, logout/relaunch, secure-storage failure, explicit downloads and cancellation, capability/root rejection, reader limits/CSP and notification routing. Root relocation additionally needs copy/conflict/persistence/cleanup regressions before claiming safety. Before distributing a platform package, launch and test that actual package on its target OS; do not substitute a successful archive build for installation/runtime validation.

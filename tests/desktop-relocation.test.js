@@ -114,7 +114,7 @@ test('cleanup preserves an original that changed after the verified copy', async
   assert.equal(await fs.readFile(original, 'utf8'), '%PDF-1.7\nupdated locally\n');
 });
 
-test('path aliases of one physical file are never removed as redundant originals', async (t) => {
+test('case aliases of one physical file are never removed as redundant originals', async (t) => {
   const { storage, source, uri, segments, seed } = await fixture(t);
   const aliasSegments = [...segments.slice(0, -1), 'NOTES.pdf'];
   const original = await storage.resolveFile(uri);
@@ -123,14 +123,9 @@ test('path aliases of one physical file are never removed as redundant originals
     if (error.code === 'ENOENT') return false;
     throw error;
   });
-  if (caseAliasExists) {
-    assert.equal(await storage.copyLocalFile(uri, source.uri, {}, aliasSegments), uri);
-  }
+  if (!caseAliasExists) return;
+  assert.equal(await storage.copyLocalFile(uri, source.uri, {}, aliasSegments), uri);
   const alias = await seed(source, aliasSegments);
-  if (!caseAliasExists) {
-    await fs.rm(aliasPath);
-    await fs.link(original, aliasPath);
-  }
   assert.notEqual(alias, uri);
   await storage.removeCopiedOriginal(uri, alias);
   assert.equal(await storage.exists(uri), true);

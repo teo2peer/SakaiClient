@@ -11,11 +11,16 @@ import { useApp } from '@/providers/app-provider';
 import { useVersionManager } from '@/providers/version-provider';
 import { isDesktop } from '@/lib/desktop';
 import type { ColorSchemePreference } from '@/constants/palettes';
+import type { FolderNavigationMode } from '@/types/sakai';
 
 const COLOR_SCHEME_OPTIONS: { id: ColorSchemePreference; label: string }[] = [
   { id: 'system', label: 'Automático' },
   { id: 'light', label: 'Claro' },
   { id: 'dark', label: 'Oscuro' },
+];
+const FOLDER_NAVIGATION_OPTIONS: { id: FolderNavigationMode; label: string }[] = [
+  { id: 'expandable', label: 'Desplegables' },
+  { id: 'screen', label: 'Pantalla completa' },
 ];
 
 export default function SettingsScreen() {
@@ -54,6 +59,14 @@ export default function SettingsScreen() {
             </Text>
             <ColorSchemePicker />
             <PalettePicker />
+          </Card>
+
+          <Card className="gap-3">
+            <Text className="text-lg font-bold text-ink dark:text-zinc-50">Recursos</Text>
+            <Text className="text-sm leading-5 text-zinc-600 dark:text-zinc-400">
+              Elige si las carpetas se despliegan en la lista o muestran su contenido en una pantalla independiente.
+            </Text>
+            <FolderNavigationPicker />
           </Card>
 
           <VersionCard />
@@ -160,6 +173,31 @@ function ColorSchemePicker() {
             active ? 'border-pine bg-pine' : 'border-line bg-white dark:bg-zinc-900'
           }`}>
           <Text className={`text-xs font-bold ${active ? 'text-pine-contrast' : 'text-ink dark:text-zinc-200'}`}>
+            {option.label}
+          </Text>
+        </Pressable>;
+      })}
+    </View>
+  );
+}
+
+function FolderNavigationPicker() {
+  const app = useApp();
+  const selected = app.data.settings.folderNavigationMode;
+  return (
+    <View accessibilityRole="radiogroup" className="flex-row gap-2">
+      {FOLDER_NAVIGATION_OPTIONS.map((option) => {
+        const active = option.id === selected;
+        return <Pressable
+          key={option.id}
+          accessibilityRole="radio"
+          accessibilityState={{ checked: active }}
+          accessibilityLabel={`Carpetas ${option.label}`}
+          onPress={() => void app.setFolderNavigationMode(option.id)}
+          className={`min-h-12 flex-1 items-center justify-center rounded-xl border px-2 py-3 active:opacity-70 ${
+            active ? 'border-pine bg-pine' : 'border-line bg-white dark:bg-zinc-900'
+          }`}>
+          <Text className={`text-center text-xs font-bold ${active ? 'text-pine-contrast' : 'text-ink dark:text-zinc-200'}`}>
             {option.label}
           </Text>
         </Pressable>;

@@ -20,6 +20,7 @@ export const EMPTY_APP_DATA: AppData = {
     downloadLocationChosen: false,
     palette: DEFAULT_PALETTE_ID,
     colorScheme: 'system',
+    folderNavigationMode: 'expandable',
   },
 };
 
@@ -116,6 +117,7 @@ export function normalizeAppData(parsed: Partial<AppData>): AppData {
       downloadLocationChosen: parsed.settings?.downloadLocationChosen === true,
       palette: isPaletteId(parsed.settings?.palette) ? parsed.settings.palette : DEFAULT_PALETTE_ID,
       colorScheme: isColorSchemePreference(parsed.settings?.colorScheme) ? parsed.settings.colorScheme : 'system',
+      folderNavigationMode: parsed.settings?.folderNavigationMode === 'screen' ? 'screen' : 'expandable',
     },
   };
 }

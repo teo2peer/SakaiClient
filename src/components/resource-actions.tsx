@@ -10,6 +10,7 @@ import { documentsInScope, type LocalDeleteScope } from '@/lib/downloads';
 import { localDocumentExists, shareLocalDocument } from '@/lib/files';
 import type { ResourceTreeNode } from '@/lib/resource-tree';
 import { useApp } from '@/providers/app-provider';
+import type { FolderNavigationMode } from '@/types/sakai';
 
 const ICONS = {
   open: require('@/assets/icons/open.svg'),
@@ -33,7 +34,8 @@ type ResourceActionsProps = {
   courseId: string;
   node: ResourceTreeNode;
   expanded: boolean;
-  onToggleFolder(): void;
+  folderNavigationMode: FolderNavigationMode;
+  onFolderPress(): void;
   onClose(): void;
 };
 
@@ -41,7 +43,7 @@ type ResourceActionsProps = {
  * Quick actions for one row of the resource tree, opened with a long press.
  * Every action here is explicit and local: nothing is deleted on PoliformaT.
  */
-export function ResourceActions({ courseId, node, expanded, onToggleFolder, onClose }: ResourceActionsProps) {
+export function ResourceActions({ courseId, node, expanded, folderNavigationMode, onFolderPress, onClose }: ResourceActionsProps) {
   const app = useApp();
   const colors = usePaletteColors();
   const [available, setAvailable] = useState<boolean>();
@@ -100,11 +102,11 @@ export function ResourceActions({ courseId, node, expanded, onToggleFolder, onCl
 
   if (node.isFolder) {
     actions.push({
-      id: 'toggle',
+      id: folderNavigationMode === 'screen' ? 'open' : 'toggle',
       icon: 'folder',
-      label: expanded ? 'Plegar carpeta' : 'Desplegar carpeta',
+      label: folderNavigationMode === 'screen' ? 'Abrir carpeta' : expanded ? 'Plegar carpeta' : 'Desplegar carpeta',
       hint: node.children.length ? `${node.children.length} elementos directos` : 'Carpeta vacía',
-      onPress: () => { onToggleFolder(); onClose(); },
+      onPress: () => { onFolderPress(); onClose(); },
     });
   } else {
     actions.push({

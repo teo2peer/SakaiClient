@@ -24,6 +24,7 @@ import { getDesktopApi, isDesktop } from '@/lib/desktop';
 import type {
   AppData,
   DownloadScope,
+  FolderNavigationMode,
   SakaiAnnouncement,
   SavedCredentials,
   SyncProgress,
@@ -55,6 +56,7 @@ type AppContextValue = {
   setNotifications(value: boolean): Promise<void>;
   setPalette(palette: PaletteId): Promise<void>;
   setColorScheme(colorScheme: ColorSchemePreference): Promise<void>;
+  setFolderNavigationMode(mode: FolderNavigationMode): Promise<void>;
   setCourseAlias(courseId: string, alias: string): Promise<void>;
   setCourseFavorite(courseId: string, favorite: boolean): Promise<void>;
   moveCourse(courseId: string, direction: 'up' | 'down'): Promise<void>;
@@ -542,6 +544,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await commit((current) => ({ ...current, settings: { ...current.settings, colorScheme } }));
   }
 
+  async function setFolderNavigationMode(folderNavigationMode: FolderNavigationMode): Promise<void> {
+    try {
+      await commit((current) => ({ ...current, settings: { ...current.settings, folderNavigationMode } }));
+    } catch (cause) { setError(errorMessage(cause)); }
+  }
+
   async function openSyncFolder(): Promise<void> {
     setError(undefined);
     const uri = dataRef.current.settings.syncRootUri;
@@ -682,6 +690,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setNotifications,
     setPalette,
     setColorScheme,
+    setFolderNavigationMode,
     setCourseAlias,
     setCourseFavorite,
     moveCourse,

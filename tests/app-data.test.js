@@ -37,7 +37,7 @@ test('new installs and imported old exports never enable automatic downloads', (
   for (const version of [1, 2, 3]) {
     const data = parseImportedAppData(JSON.stringify({ version, courses: [], settings: { automaticSync: true, notifications: true, syncRootUri: 'file:///other-phone' } }));
     expect(data.version).toBe(3);
-    expect(data.settings).toEqual({ notifications: false, syncRootUri: undefined, syncRootName: undefined, downloadLocationChosen: false, palette: 'pine', colorScheme: 'system' });
+    expect(data.settings).toEqual({ notifications: false, syncRootUri: undefined, syncRootName: undefined, downloadLocationChosen: false, palette: 'pine', colorScheme: 'system', folderNavigationMode: 'expandable' });
   }
 });
 
@@ -191,7 +191,7 @@ function providerActions({ importAppData, setBackgroundSyncEnabled = async () =>
   return { actions: module.exports.AppProvider({ children: null }).props.value, createSyncWorkspace, clear };
 }
 
-test('persists the color scheme and opens only the configured download root', async () => {
+test('persists display preferences and opens only the configured download root', async () => {
   const openSyncRoot = mock(async () => {});
   const { actions } = providerActions({
     importAppData: async () => ({
@@ -202,8 +202,10 @@ test('persists the color scheme and opens only the configured download root', as
   });
   await actions.importData();
   await actions.setColorScheme('dark');
+  await actions.setFolderNavigationMode('screen');
   await actions.openSyncFolder();
   expect((await loadAppData()).settings.colorScheme).toBe('dark');
+  expect((await loadAppData()).settings.folderNavigationMode).toBe('screen');
   expect(openSyncRoot).toHaveBeenCalledWith('sakai-root://authorized');
 });
 

@@ -6,6 +6,20 @@ Sakai Client releases are available from the [GitHub Releases page](https://gith
 
 The desktop packages are not code-signed, the macOS packages are not notarized, and the Android and iOS packages are unsigned. Read the platform section before downloading: the mobile packages require your own signing credentials and cannot be installed merely by accepting an operating-system warning.
 
+## Contents
+
+| Section | What it covers |
+| --- | --- |
+| [Choose an Asset](#choose-an-asset) | Select the correct release file for the device and architecture |
+| [Verify the Download](#verify-the-download) | Compare the release SHA-256 checksum before installation |
+| [Windows](#windows) | Installer, SmartScreen, file unblocking and common errors |
+| [macOS](#macos) | DMG installation, Gatekeeper, quarantine and `xattr` |
+| [Linux](#linux) | AppImage permissions, FUSE and architecture errors |
+| [Android](#android) | APK signing, unknown-source permission, Play Protect and updates |
+| [iPhone and iPad](#iphone-and-ipad) | IPA signing, Feather, provisioning, trust and Developer Mode |
+| [Web Viewer](#web-viewer) | Local HTTP server and browser-mode limitations |
+| [After Installation](#after-installation) | Usage documentation, updates and source builds |
+
 ## Choose an Asset
 
 The current `v1.0.0` release contains:

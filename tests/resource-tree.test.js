@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 
-import { buildResourceTree, visibleResourceRows } from '../src/lib/resource-tree.ts';
+import { buildResourceTree, resourceFolderView, visibleResourceRows } from '../src/lib/resource-tree.ts';
 import { resourceFingerprint } from '../src/lib/paths.ts';
 
 function resource(path, isFolder = false) {
@@ -42,6 +42,20 @@ test('only renders expanded branches and keeps each row at its original depth', 
     ['A', 0], ['A/B', 1], ['A/B/file.pdf', 2], ['root.txt', 0],
   ]);
   expect(visibleResourceRows(tree, new Set(['A/B']))).toHaveLength(2);
+});
+
+test('renders one folder level with display-name breadcrumbs in screen mode', () => {
+  const tree = buildResourceTree([
+    resource('Topic/Exercises/notes.pdf'),
+    resource('Topic/slides.pdf'),
+    { ...resource('Topic', true), name: 'Teaching materials' },
+  ], []);
+  const view = resourceFolderView(tree, 'Topic/Exercises');
+  expect(view.breadcrumbs.map((node) => node.name)).toEqual(['Teaching materials', 'Exercises']);
+  expect(view.rows.map(({ node, depth }) => [node.path, depth])).toEqual([
+    ['Topic/Exercises/notes.pdf', 0],
+  ]);
+  expect(resourceFolderView(tree, 'Missing').rows.map(({ node }) => node.path)).toEqual(['Topic']);
 });
 
 test('keeps downloaded files accessible when a remote listing no longer includes them', () => {

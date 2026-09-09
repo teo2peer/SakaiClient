@@ -83,6 +83,8 @@ export type DownloadScope =
   | { type: 'folder'; courseId: string; path: string }
   | { type: 'file'; courseId: string; resource: SakaiResource; force?: boolean };
 
+export type FolderNavigationMode = 'expandable' | 'screen';
+
 export type AppSettings = {
   notifications: boolean;
   syncRootUri?: string;
@@ -90,6 +92,7 @@ export type AppSettings = {
   downloadLocationChosen?: boolean;
   palette?: PaletteId;
   colorScheme?: ColorSchemePreference;
+  folderNavigationMode: FolderNavigationMode;
 };
 
 export type AppData = {

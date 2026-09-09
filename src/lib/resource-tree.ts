@@ -92,3 +92,23 @@ export function visibleResourceRows(
   visit(tree, 0);
   return rows;
 }
+
+export function resourceFolderView(
+  tree: ResourceTreeNode[],
+  folderPath: string,
+): { breadcrumbs: ResourceTreeNode[]; rows: { node: ResourceTreeNode; depth: number }[] } {
+  if (!folderPath) return { breadcrumbs: [], rows: tree.map((node) => ({ node, depth: 0 })) };
+
+  const breadcrumbs: ResourceTreeNode[] = [];
+  let siblings = tree;
+  for (const segment of folderPath.split('/')) {
+    const parentPath = breadcrumbs.at(-1)?.path;
+    const path = parentPath ? `${parentPath}/${segment}` : segment;
+    const folder = siblings.find((node) => node.isFolder && node.path === path);
+    if (!folder) return { breadcrumbs: [], rows: tree.map((node) => ({ node, depth: 0 })) };
+    breadcrumbs.push(folder);
+    siblings = folder.children;
+  }
+
+  return { breadcrumbs, rows: siblings.map((node) => ({ node, depth: 0 })) };
+}

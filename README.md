@@ -115,7 +115,7 @@ The provisioning profile has a fixed App ID. Installing this build can replace a
 
 ## GitHub builds and releases
 
-[The workflow](.github/workflows/ci.yml) validates the project and builds artifacts for Android, iOS, web, Windows x64, Linux x64, and macOS arm64/x64 on pushes. Pull requests validate and export web only; version tags such as `v1.2.3` create a GitHub Release after all required jobs pass. Prerelease tags such as `v1.2.3-beta.1` create prereleases. Existing published releases are not overwritten.
+[The workflow](.github/workflows/ci.yml) validates and exports web on every branch push and pull request. Version tags and manual runs additionally build Android, iOS, Windows x64, Linux x64, and macOS arm64/x64; tags such as `v1.2.3` create a GitHub Release after all required jobs pass. Prerelease tags such as `v1.2.3-beta.1` create prereleases. Existing published releases are not overwritten.
 
 The CI mobile outputs are explicitly **unsigned**: an APK without a signing configuration and an iOS device IPA using `dev.sakaiclient.unofficial`. Neither is directly installable without appropriate signing. Desktop installers are not code-signed or notarized and may trigger OS trust warnings. CI does not use or upload the private signing files from the local Mac. There is no App Store, TestFlight, Play Store or automatic-update deployment in this workflow.
 

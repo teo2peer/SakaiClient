@@ -16,7 +16,7 @@ Snapshot: **2026-09-09**, current uncommitted working tree on `main`. This recor
 | Real Electron relaunch | Not established for this change. Two Playwright launches reached Electron's debugger/DevTools endpoints but timed out before the first window attached. The older synthetic desktop PDF image remains; current IPC/storage behavior is covered by Node tests, not this failed runtime attempt. |
 | Native/desktop package rebuilds | Hosted CI built current unsigned Android/iOS artifacts and desktop packages for Windows x64, Linux x64 and macOS arm64/x64. Local package rebuilds were not repeated. |
 | Physical-device picker/move/UI validation | Not established. The latest phone installation attempt failed because the target device was unavailable. |
-| Hosted GitHub Actions | Current `main` passed validation and all platform packaging jobs in [run 34338925563](https://github.com/teo2peer/SakaiClient/actions/runs/34338925563). Version-tag publication was still pending at this snapshot. |
+| Hosted GitHub Actions | Current `main` passed validation and all platform packaging jobs in [run 34338925563](https://github.com/teo2peer/SakaiClient/actions/runs/34338925563). Release [`v1.0.0`](https://github.com/teo2peer/SakaiClient/releases/tag/v1.0.0) was published from those verified artifacts. |
 
 The checks below validate the current source within their stated boundaries. They do not replace physical-device or packaged-application validation.
 
@@ -69,7 +69,7 @@ Locally generated native/desktop binaries from the historical runs are stale rel
 ## Unvalidated Boundaries
 
 - Windows and Linux desktop runtime and macOS x64 runtime were not run locally. Hosted packaging passed, but does not prove installed runtime behavior.
-- Hosted validation and artifact upload passed on `main`; version-tag publication had not yet been exercised at this snapshot.
+- Hosted validation and artifact upload passed on `main`. The automated tag rebuild was cancelled to avoid duplicating the same platform compilation; `v1.0.0` was published directly from the verified `main` artifacts with generated SHA-256 checksums.
 - The latest actual phone install failed because the device was unavailable. Do not claim the latest native UI, native PDF interaction, system picker or document move was verified on a physical device.
 - Android external providers and iOS folder reauthorization need real-device checks. No persistent iOS bookmark or cross-provider durability guarantee is established.
 - Native background scheduling, download-completion notifications and OS click routing remain OS-dependent; fixture/unit checks do not establish delivery timing.

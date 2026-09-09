@@ -2,7 +2,7 @@
 
 [Documentation index](../README.md#documentation) | [Development](../docs/DEVELOPMENT.md) | [Validation record](../docs/VALIDATION.md) | [Unsigned build notice](UNSIGNED-RELEASE.md)
 
-The configured workflow is [workflows/ci.yml](workflows/ci.yml). It triggers on every branch push, `v*` tag push, pull request, and manual dispatch. Pushes and manual runs build Android, iOS, web, Windows x64, Linux x64, and macOS arm64/x64. Pull requests only export web and run unit tests, lint, and typechecking to limit hosted runner costs. Native and desktop builds depend on successful validation.
+The configured workflow is [workflows/ci.yml](workflows/ci.yml). It triggers on every branch push, `v*` tag push, pull request, and manual dispatch. Every run exports web and runs unit tests, lint, and typechecking. Native and desktop builds run only for tags and manual dispatches, depend on successful validation, and target Android, iOS, Windows x64, Linux x64, and macOS arm64/x64. This keeps ordinary branch feedback fast and avoids rebuilding every platform for each commit.
 
 This contract is active in the public [teo2peer/SakaiClient](https://github.com/teo2peer/SakaiClient) repository. The current `main` source passed the complete hosted workflow in [run 34338925563](https://github.com/teo2peer/SakaiClient/actions/runs/34338925563), including validation and every documented platform build. Review runner availability, permissions, usage and CI-minute limits, especially for macOS, before changing broad push builds.
 
@@ -79,4 +79,4 @@ The earlier `actionlint` v1.7.12 check passed. The current hosted `main` run pas
 
 For workflow/helper changes, the existing `tests/ci.test.js` covers tag/version/run-number validation and release asset flattening/checksums/duplicate rejection without contacting GitHub. Its temporary files use `os.tmpdir()`; select an approved `TMPDIR` when validating locally. `actionlint` and `bash -n scripts/build-ios-ci.sh` are focused syntax checks. The workflow itself builds web before running `bun test`, `bun run lint` and `bun run typecheck`.
 
-Hosted native/platform packaging now passes for the documented targets. Installation, signing and device/runtime validation remain separate, and version-tag publication had not yet been exercised at this documentation snapshot.
+Hosted native/platform packaging passes for the documented targets. Installation, signing and device/runtime validation remain separate. Release [`v1.0.0`](https://github.com/teo2peer/SakaiClient/releases/tag/v1.0.0) was published from the verified artifacts of the green hosted `main` run; its redundant tag rebuild was cancelled rather than compiling every platform a second time.

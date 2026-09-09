@@ -35,6 +35,7 @@ The views above are 390 px responsive browser fixtures. They validate the shared
 
 ## Documentation
 
+- [Installation](INSTALL.md): release assets, checksum verification, OS trust prompts, mobile signing and platform-specific troubleshooting.
 - [Usage](docs/USAGE.md): first launch, downloads, readers, announcements and troubleshooting.
 - [Storage and privacy](docs/STORAGE-PRIVACY.md): folder relocation, cancellation, recovery, credentials, exports and account switching.
 - [Development](docs/DEVELOPMENT.md): prerequisites, package scripts, native builds and generated assets.
@@ -115,7 +116,7 @@ The provisioning profile has a fixed App ID. Installing this build can replace a
 
 ## GitHub builds and releases
 
-[The workflow](.github/workflows/ci.yml) validates and exports web on every branch push and pull request. Version tags and manual runs additionally build Android, iOS, Windows x64, Linux x64, and macOS arm64/x64; tags such as `v1.2.3` create a GitHub Release after all required jobs pass. Prerelease tags such as `v1.2.3-beta.1` create prereleases. Existing published releases are not overwritten.
+[The workflow](.github/workflows/ci.yml) validates and exports web for pull requests, version tags and manual runs; ordinary branch pushes do not start a workflow. Version tags and manual runs additionally build Android, iOS, Windows x64, Linux x64, and macOS arm64/x64; tags such as `v1.2.3` create a GitHub Release after all required jobs pass. Prerelease tags such as `v1.2.3-beta.1` create prereleases. Existing published releases are not overwritten.
 
 The CI mobile outputs are explicitly **unsigned**: an APK without a signing configuration and an iOS device IPA using `dev.sakaiclient.unofficial`. Neither is directly installable without appropriate signing. Desktop installers are not code-signed or notarized and may trigger OS trust warnings. CI does not use or upload the private signing files from the local Mac. There is no App Store, TestFlight, Play Store or automatic-update deployment in this workflow.
 

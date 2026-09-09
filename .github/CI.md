@@ -2,7 +2,7 @@
 
 [Documentation index](../README.md#documentation) | [Development](../docs/DEVELOPMENT.md) | [Validation record](../docs/VALIDATION.md) | [Unsigned build notice](UNSIGNED-RELEASE.md)
 
-The configured workflow is [workflows/ci.yml](workflows/ci.yml). It triggers on every branch push, `v*` tag push, pull request, and manual dispatch. Every run exports web and runs unit tests, lint, and typechecking. Native and desktop builds run only for tags and manual dispatches, depend on successful validation, and target Android, iOS, Windows x64, Linux x64, and macOS arm64/x64. This keeps ordinary branch feedback fast and avoids rebuilding every platform for each commit.
+The configured workflow is [workflows/ci.yml](workflows/ci.yml). It triggers on `v*` tag pushes, pull requests, and manual dispatches; ordinary branch pushes do not start a run. Every triggered run exports web and runs unit tests, lint, and typechecking. Native and desktop builds run only for tags and manual dispatches, depend on successful validation, and target Android, iOS, Windows x64, Linux x64, and macOS arm64/x64. This avoids consuming Actions capacity for every commit while retaining pull-request validation and explicit release builds.
 
 This contract is active in the public [teo2peer/SakaiClient](https://github.com/teo2peer/SakaiClient) repository. The current `main` source passed the complete hosted workflow in [run 34338925563](https://github.com/teo2peer/SakaiClient/actions/runs/34338925563), including validation and every documented platform build. Review runner availability, permissions, usage and CI-minute limits, especially for macOS, before changing broad push builds.
 

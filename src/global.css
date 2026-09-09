@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --font-display:
     Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
@@ -6,4 +10,16 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
   --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
   --font-serif: Georgia, 'Times New Roman', serif;
+}
+
+/* Default palette ("Bosque", light). Overridden at runtime by <ThemedSurface>
+   with the palette selected in Settings — see src/constants/palettes.ts. */
+:root {
+  --color-ink: 23 33 27;
+  --color-pine: 31 91 69;
+  --color-pine-contrast: 255 255 255;
+  --color-mint: 220 237 229;
+  --color-paper: 245 247 244;
+  --color-line: 216 222 217;
+  --color-ember: 184 78 50;
 }

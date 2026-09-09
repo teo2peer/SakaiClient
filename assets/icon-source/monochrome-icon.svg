@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <mask id="cutout">
+      <rect width="1024" height="1024" fill="#ffffff"/>
+      <path d="M512 390v224m-92-86 92 92 92-92" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="56"/>
+      <path d="M382 706h260" fill="none" stroke="#000000" stroke-linecap="round" stroke-width="56"/>
+    </mask>
+  </defs>
+  <path d="M328 184h280c97 0 176 79 176 176v480H328c-49 0-88-39-88-88V272c0-49 39-88 88-88z" fill="#000000" mask="url(#cutout)"/>
+</svg>

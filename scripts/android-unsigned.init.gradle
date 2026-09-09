@@ -1,0 +1,8 @@
+// Expo templates may use the debug key for Release. Disable signing before AGP creates variants.
+gradle.beforeProject { project ->
+    project.pluginManager.withPlugin('com.android.application') {
+        project.extensions.getByName('androidComponents').finalizeDsl { android ->
+            android.buildTypes.getByName('release').signingConfig = null
+        }
+    }
+}

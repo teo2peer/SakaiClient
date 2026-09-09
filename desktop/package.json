@@ -1,0 +1,9 @@
+{
+  "name": "sakai-client-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unofficial PoliformaT desktop client with local document synchronization",
+  "author": "Sakai Client contributors",
+  "license": "MIT",
+  "main": "main.cjs"
+}

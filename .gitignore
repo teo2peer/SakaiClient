@@ -31,7 +31,9 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
+.env
+.env.*
+!.env.example
 
 # typescript
 *.tsbuildinfo
@@ -41,3 +43,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Generated local PDF runtime resources
+/src/lib/pdf-assets.generated.ts

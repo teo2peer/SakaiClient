@@ -1,0 +1,291 @@
+name: Build and Release
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: '1'
+  EXPO_NO_TELEMETRY: '1'
+  EXPO_NO_DOTENV: '1'
+  ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+
+jobs:
+  validate:
+    name: Validate and Export Web
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+      native_version: ${{ steps.metadata.outputs.native_version }}
+      build_number: ${{ steps.metadata.outputs.build_number }}
+      prerelease: ${{ steps.metadata.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: '1.3.14'
+      - name: Validate Version Metadata
+        id: metadata
+        run: node ./scripts/ci-metadata.mjs
+      - name: Install Locked Dependencies
+        run: bun install --frozen-lockfile
+      - name: Generate PDF Assets
+        run: bun run pdf:assets
+      - name: Build Web Before Validation
+        env:
+          BUILD_VERSION: ${{ steps.metadata.outputs.native_version }}
+          BUILD_NUMBER: ${{ steps.metadata.outputs.build_number }}
+        run: bun run build:web
+      - name: Prepare Web Archive Directory
+        run: mkdir -p dist/releases
+      - name: Archive Web Export
+        working-directory: dist/web
+        run: zip -q -r "$GITHUB_WORKSPACE/dist/releases/SakaiClient-web.zip" .
+      - name: Upload Shared Desktop Renderer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: web-renderer
+          path: dist/web/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload Web Distributable
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-web
+          path: dist/releases/SakaiClient-web.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+      - name: Unit Tests
+        run: bun test
+      - name: Lint
+        run: bun run lint
+      - name: Typecheck
+        run: bun run typecheck
+
+  android:
+    name: Android Unsigned Release
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      BUILD_VERSION: ${{ needs.validate.outputs.native_version }}
+      BUILD_NUMBER: ${{ needs.validate.outputs.build_number }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: '1.3.14'
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+          # Native Gradle files do not exist until Expo prebuild runs.
+          cache-dependency-path: bun.lock
+      - name: Install Locked Dependencies
+        run: bun install --frozen-lockfile
+      - name: Generate Native Android Project
+        run: |
+          bun run pdf:assets
+          bunx expo prebuild --platform android --clean --no-install
+      - name: Assemble Release Without Any Signing Configuration
+        working-directory: android
+        run: >-
+          ./gradlew :app:assembleRelease
+          --init-script ../scripts/android-unsigned.init.gradle
+          --no-daemon --max-workers=2
+          -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g"
+      - name: Require the Unsigned APK
+        run: |
+          test -s android/app/build/outputs/apk/release/app-release-unsigned.apk
+          test ! -e android/app/build/outputs/apk/release/app-release.apk
+          mkdir -p dist/releases
+          cp android/app/build/outputs/apk/release/app-release-unsigned.apk dist/releases/SakaiClient-android-unsigned.apk
+      - name: Upload Android Distributable
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-android-unsigned
+          path: dist/releases/SakaiClient-android-unsigned.apk
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  ios:
+    name: iOS Unsigned Release
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: macos-26
+    timeout-minutes: 90
+    env:
+      BUILD_VERSION: ${{ needs.validate.outputs.native_version }}
+      BUILD_NUMBER: ${{ needs.validate.outputs.build_number }}
+      IOS_BUNDLE_IDENTIFIER: dev.sakaiclient.unofficial
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: '1.3.14'
+      - name: Install Locked Dependencies
+        run: bun install --frozen-lockfile
+      - name: Build Unsigned Device IPA
+        run: bun run build:ios:ci
+      - name: Upload iOS Distributable
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-ios-unsigned
+          path: dist/releases/SakaiClient-ios-unsigned.ipa
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  desktop:
+    name: Desktop ${{ matrix.platform }} ${{ matrix.arch }}
+    if: github.event_name != 'pull_request'
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            runner: ubuntu-24.04
+            target: --appimage
+            arch: x64
+          - platform: windows
+            runner: windows-2025
+            target: --win
+            arch: x64
+          - platform: macos
+            runner: macos-26
+            target: --mac
+            arch: arm64
+          - platform: macos
+            runner: macos-26
+            target: --mac
+            arch: x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    env:
+      BUILD_VERSION: ${{ needs.validate.outputs.version }}
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      DESKTOP_TARGET: ${{ matrix.target }}
+      DESKTOP_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: '1.3.14'
+      - name: Install Locked Dependencies
+        run: bun install --frozen-lockfile
+      - name: Download Validated Web Renderer
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: web-renderer
+          path: dist/web
+      - name: Package Unsigned Desktop Application
+        run: node ./desktop/build.cjs "$DESKTOP_TARGET" "--$DESKTOP_ARCH"
+      - name: Upload Desktop Distributables Only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-desktop-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            dist/desktop/*.exe
+            dist/desktop/*.dmg
+            dist/desktop/*.AppImage
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  release:
+    name: Publish Tagged GitHub Release
+    if: github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+    needs: [validate, android, ios, desktop]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.19.0'
+          package-manager-cache: false
+      - name: Revalidate Release Metadata
+        id: metadata
+        run: node ./scripts/ci-metadata.mjs
+      - name: Download All Distributables
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          pattern: release-*
+          path: dist/release-downloads
+          # Preserve separate directories so duplicate filenames cannot be overwritten.
+          merge-multiple: false
+      - name: Prepare Unique Release Files and Checksums
+        run: node ./scripts/release-assets.mjs dist/release-downloads dist/release-assets
+      - name: Create a New Release Without Replacing Existing Assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: v${{ steps.metadata.outputs.version }}
+          RELEASE_PRERELEASE: ${{ steps.metadata.outputs.prerelease }}
+        run: |
+          if [[ ! "$GH_REPO" =~ ^[A-Za-z0-9][A-Za-z0-9-]*/[A-Za-z0-9_.-]+$ ]]; then
+            printf '%s\n' 'Invalid repository identifier.' >&2
+            exit 1
+          fi
+          case "$RELEASE_PRERELEASE" in
+            true) release_flags=(--prerelease) ;;
+            false) release_flags=() ;;
+            *) printf '%s\n' 'Invalid prerelease metadata.' >&2; exit 1 ;;
+          esac
+          if gh release view "$RELEASE_TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+            printf '%s\n' 'This release already exists. Publish a new version instead of overwriting it.' >&2
+            exit 1
+          fi
+          gh release create "$RELEASE_TAG" --repo "$GH_REPO" \
+            --verify-tag --generate-notes --notes-file .github/UNSIGNED-RELEASE.md \
+            "${release_flags[@]}" dist/release-assets/*

@@ -1,0 +1,49 @@
+appId: dev.sakaiclient.unofficial
+productName: Sakai Client
+artifactName: SakaiClient-${version}-${os}-${arch}.${ext}
+asar: true
+npmRebuild: false
+forceCodeSigning: false
+publish: null
+directories:
+  output: ../dist/desktop
+files:
+  - main.cjs
+  - preload.cjs
+  - policy.cjs
+  - network.cjs
+  - storage.cjs
+  - protocol.cjs
+  - package.json
+beforePack: ./licenses.cjs
+extraResources:
+  - from: ../dist/web
+    to: renderer
+    filter:
+      - '**/*'
+      - '!**/*.map'
+  - from: ../LICENSE
+    to: licenses/PROJECT-LICENSE.txt
+  - from: .generated/THIRD_PARTY_NOTICES.txt
+    to: licenses/THIRD_PARTY_NOTICES.txt
+win:
+  target: nsis
+  signAndEditExecutable: false
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+mac:
+  target: dmg
+  category: public.app-category.education
+  identity: null
+  notarize: false
+  hardenedRuntime: false
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Education
+  maintainer: Sakai Client contributors
+  synopsis: Unofficial PoliformaT desktop client

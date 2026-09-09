@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { usePaletteColors } from '@/hooks/use-palette';
 import { useApp } from '@/providers/app-provider';
+import { useVersionManager } from '@/providers/version-provider';
 import { isDesktop } from '@/lib/desktop';
 import type { ColorSchemePreference } from '@/constants/palettes';
 
@@ -54,6 +55,8 @@ export default function SettingsScreen() {
             <ColorSchemePicker />
             <PalettePicker />
           </Card>
+
+          <VersionCard />
 
           {isDesktop() && app.data.settings.syncRootUri ? (
             <Card className="gap-3">
@@ -162,6 +165,44 @@ function ColorSchemePicker() {
         </Pressable>;
       })}
     </View>
+  );
+}
+
+function VersionCard() {
+  const versions = useVersionManager();
+  const status = versions.updateAvailable && versions.latestRelease
+    ? `Nueva versión ${versions.latestRelease.version} disponible.`
+    : versions.checkError
+      ? versions.checkError
+      : versions.lastCheckedAt
+        ? 'Tienes la última versión publicada.'
+        : 'La aplicación comprobará las releases oficiales de GitHub.';
+  return (
+    <Card className="gap-3">
+      <Text className="text-lg font-bold text-ink dark:text-zinc-50">Actualizaciones</Text>
+      <Text className="text-sm text-zinc-600 dark:text-zinc-400">
+        Versión instalada: {versions.currentVersion}
+      </Text>
+      <Text className="text-sm leading-5 text-zinc-600 dark:text-zinc-400">{status}</Text>
+      <View className="gap-2 sm:flex-row">
+        {versions.updateAvailable ? (
+          <View className="flex-1">
+            <Button label="Ver nueva versión" onPress={() => void versions.openLatestRelease()} />
+          </View>
+        ) : null}
+        <View className="flex-1">
+          <Button
+            label="Comprobar actualizaciones"
+            onPress={() => void versions.checkForUpdates()}
+            variant="secondary"
+            loading={versions.checking}
+          />
+        </View>
+      </View>
+      <Text className="text-xs leading-5 text-zinc-500">
+        La aplicación solo avisa. No descarga ni instala actualizaciones automáticamente.
+      </Text>
+    </Card>
   );
 }
 

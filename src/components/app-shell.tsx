@@ -3,6 +3,7 @@ import { useSegments } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorBanner } from '@/components/error-banner';
+import { VersionUpdateBanner } from '@/components/version-update-banner';
 import { useApp } from '@/providers/app-provider';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -12,6 +13,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <View className="flex-1 bg-paper dark:bg-zinc-950">
       <SafeAreaView edges={inTabs ? ['top'] : ['top', 'bottom']} className="mx-auto w-full max-w-4xl flex-1">
         <ErrorBanner message={error} onDismiss={clearError} />
+        <VersionUpdateBanner />
         {children}
       </SafeAreaView>
     </View>

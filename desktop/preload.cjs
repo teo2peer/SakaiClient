@@ -46,6 +46,7 @@ if (process.isMainFrame && location.protocol === 'sakai-app:' && location.host =
     apiVersion: 1,
     request: (id, input) => invoke('sakai:request', id, input),
     cancel: (id) => invoke('sakai:cancel', id),
+    getLatestRelease: () => invoke('sakai:get-latest-release'),
     getSecret: (key) => invoke('sakai:get-secret', key),
     setSecret: (key, value) => invoke('sakai:set-secret', key, value),
     clearSecret: (key) => invoke('sakai:clear-secret', key),

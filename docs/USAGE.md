@@ -24,7 +24,7 @@ The four screens are real Expo Router tabs, not decorative navigation buttons:
 | Asignaturas | Course list and nested resource trees |
 | Anuncios | Cross-course inbox, local search, course filter and unread filter |
 | Descargas | Selected root, whole-library download, progress and cancellation |
-| Ajustes | Automatic/light/dark appearance, palettes, open the desktop download folder, notification opt-in, import/export, clear index and sign out |
+| Ajustes | Automatic/light/dark appearance, palettes, version checks, open the desktop download folder, notification opt-in, import/export, clear index and sign out |
 
 Courses, announcement details and document readers have their own routes. The announcement tab badge reflects local unread flags.
 
@@ -95,6 +95,14 @@ Enable notifications in Ajustes and grant OS permission. They are off by default
 - The native background task fetches announcements and sends notifications only; it does not overwrite `AppData`, download documents or refresh the foreground index on disk.
 - Desktop emits metadata refresh events every 15 minutes while the app remains open and configured. There is no closed-app scheduler, tray service or login item.
 - Opening an individual announcement notification routes to its detail; an announcement summary routes to the inbox; a download completion routes to Descargas. If an announcement detail is absent locally, the app can refresh it when authenticated.
+
+## Version Updates
+
+The app loads the last version result on launch and refreshes it from the latest stable, non-draft GitHub Release when the last successful cached check is at least 24 hours old. A failed cached check is retried after relaunch; the same successful-check interval applies when returning to the foreground. **Comprobar actualizaciones** always requests an immediate check. This is independent of PoliformaT authentication and does not block startup, login or offline data when GitHub cannot be reached.
+
+When a newer semantic version is available, the app shows a dismissible banner and an indicator on Ajustes. The **Actualizaciones** card displays the installed version, allows an immediate manual check, and opens the validated release page. Dismissing the banner lasts for the current app session; the update remains visible in Ajustes.
+
+The version manager is notification-only. It does not download, sign, install or replace the application, and the latest endpoint intentionally ignores prereleases. Follow the platform-specific steps in [Installation](../INSTALL.md), including checksum and signing requirements.
 
 ## Imports and Local Data
 

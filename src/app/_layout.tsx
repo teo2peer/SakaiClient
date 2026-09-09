@@ -7,6 +7,7 @@ import { useEffect, useMemo } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import { AppProvider, useApp } from '@/providers/app-provider';
+import { VersionProvider } from '@/providers/version-provider';
 import { subscribeAnnouncementOpen } from '@/lib/notifications';
 import { DownloadLocationScreen } from '@/components/download-location-screen';
 import { ThemedSurface } from '@/components/themed-surface';
@@ -21,7 +22,9 @@ export default function RootLayout() {
 
   return (
     <AppProvider>
-      <ThemedApp />
+      <VersionProvider>
+        <ThemedApp />
+      </VersionProvider>
     </AppProvider>
   );
 }

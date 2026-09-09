@@ -16,6 +16,7 @@ Independent, unofficial client for the Sakai learning platform, currently config
 - Local native PDF rendering on iOS/Android through `react-native-pdf`, bundled PDF.js on desktop, and simplified read-only DOCX, ODT, PPTX, TXT, MD and CSV previews.
 - A full Electron desktop client with restricted IPC, streaming file operations and OS-encrypted credentials where available. Ordinary browsers are read-only import viewers.
 - Opt-in local announcement and download-completion notifications, offline indexes and JSON exports without authentication secrets. Exports can still contain personal and copyrighted content.
+- An in-app version check against the latest stable GitHub Release, with a dismissible notice and manual installation link. It never downloads or installs updates automatically.
 
 ## Screenshots
 

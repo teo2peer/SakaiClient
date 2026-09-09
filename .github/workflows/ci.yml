@@ -54,6 +54,8 @@ jobs:
       - name: Build Web Before Validation
         env:
           BUILD_VERSION: ${{ steps.metadata.outputs.native_version }}
+          RELEASE_VERSION: ${{ steps.metadata.outputs.version }}
+          EXPO_PUBLIC_RELEASE_VERSION: ${{ steps.metadata.outputs.version }}
           BUILD_NUMBER: ${{ steps.metadata.outputs.build_number }}
         run: bun run build:web
       - name: Prepare Web Archive Directory
@@ -92,6 +94,8 @@ jobs:
     timeout-minutes: 90
     env:
       BUILD_VERSION: ${{ needs.validate.outputs.native_version }}
+      RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+      EXPO_PUBLIC_RELEASE_VERSION: ${{ needs.validate.outputs.version }}
       BUILD_NUMBER: ${{ needs.validate.outputs.build_number }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -147,6 +151,8 @@ jobs:
     timeout-minutes: 90
     env:
       BUILD_VERSION: ${{ needs.validate.outputs.native_version }}
+      RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+      EXPO_PUBLIC_RELEASE_VERSION: ${{ needs.validate.outputs.version }}
       BUILD_NUMBER: ${{ needs.validate.outputs.build_number }}
       IOS_BUNDLE_IDENTIFIER: dev.sakaiclient.unofficial
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
@@ -202,6 +208,7 @@ jobs:
     timeout-minutes: 45
     env:
       BUILD_VERSION: ${{ needs.validate.outputs.version }}
+      BUILD_NUMBER: ${{ needs.validate.outputs.build_number }}
       CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       DESKTOP_TARGET: ${{ matrix.target }}
       DESKTOP_ARCH: ${{ matrix.arch }}

@@ -16,6 +16,7 @@ Import `getDesktopApi()`, `isDesktop()`, and the types from `src/lib/desktop.ts`
 | --- | --- |
 | `request(id, { url, method?, headers?, body?, redirect? })` | `Promise<{ status, statusText, url, headers: [string, string][], body: string }>`; text capped at 8 MiB. Non-success HTTP responses are returned, not thrown. |
 | `cancel(id)` | `Promise<void>`; cancels a request, download or registered relocation operation and waits for its cleanup. Unknown IDs are harmless. |
+| `getLatestRelease()` | `Promise<unknown>` containing a bounded, validated projection of the latest stable release from the fixed public Sakai Client GitHub endpoint. It accepts no renderer-supplied URL. |
 | `getSecret(key)` | `Promise<string \| null>` for `credentials` or `session` only. |
 | `setSecret(key, value)` | `Promise<void>`; OS-encrypted storage only, subject to the fallback below. |
 | `clearSecret(key)` | `Promise<void>`; clearing `session` also aborts network work, clears university cookies and HTTP auth cache, stops background events, and closes notifications. |
@@ -48,7 +49,7 @@ Failures reject with **plain structured `DesktopError` data**, not an `Error` in
 - Route desktop metadata requests through `request`. Convert supported `RequestInit` data to the serializable contract; forward only string or URL-encoded bodies and supported headers. Wire `AbortSignal` to `cancel`, including already-aborted signals, and remove listeners when settled.
 - Build the renderer-side `Response` with a null body for HEAD and statuses 204, 205 and 304. Preserve the returned URL without logging it; login may include a ticket or session ID. Redirect metadata has an empty body and may have an empty status text.
 - Supported headers are Accept, Content-Type, Cache-Control, Pragma, Depth, and the existing exact `Cookie: JSESSIONID=<id>`. The latter becomes an HttpOnly university cookie, never a forwarded raw Cookie header. Arbitrary Cookie, Authorization, Origin, Referer, and Host headers are rejected.
-- Direct/session, portal login/logout/site landing pages, CAS login/continue/logout, site/announcement JSON, content discovery, access/content, content, and WebDAV are allowed with specific methods. CAS `service` destinations must point back to the permitted PoliformaT login endpoints. All network I/O uses one nonpersistent authenticated session. Ordinary renderer fetch cannot contact the internet.
+- Direct/session, portal login/logout/site landing pages, CAS login/continue/logout, site/announcement JSON, content discovery, access/content, content, and WebDAV are allowed with specific methods. CAS `service` destinations must point back to the permitted PoliformaT login endpoints. Authenticated network I/O uses one nonpersistent session. Ordinary renderer fetch cannot contact the internet; the separate `getLatestRelease` method accepts no URL and queries only the hard-coded public GitHub endpoint.
 - Use `download` for explicit file synchronization, not `request` or browser fetch. Subscribe to progress before invoking it, correlate by operation ID, wire `AbortSignal` to `cancel`, and unsubscribe after settlement. Await `exists`, preserve returned capability URIs in local metadata, and keep sync-engine cancellation semantics. Capabilities are installation-specific; imported URIs are marked untrusted and must never be passed to `exists`, read, open, move or delete operations on the receiving installation.
 - Path segments reject hidden names, leading/trailing spaces, traversal, separators, Windows device names even with extensions, and alternate data streams. Keep `src/lib/paths.ts` consistent with these restrictions and surface failures rather than weakening the policy.
 - Route document preview reads, JSON transfer, notifications and background hooks through the bridge only when detected. Ordinary browsers retain read-only index import behavior, with no direct authenticated requests or access to another device's document bytes.
@@ -83,7 +84,7 @@ Run from the repository root with dependencies installed. Bun 1.3.14 and Node 24
 bun run build:web
 bun run lint
 bun run typecheck
-node --test tests/desktop-relocation.test.js tests/desktop-policy.test.js
+node --test tests/desktop-relocation.test.js tests/desktop-policy.test.js tests/desktop-release.test.js
 bunx electron desktop
 node desktop/build.cjs --dir
 ```

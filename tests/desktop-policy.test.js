@@ -196,12 +196,14 @@ test('preload exposes fixed methods and uses plain rejections so Electron keeps 
     return true;
   });
   assert.equal(calls[0][0], 'sakai:request');
+  await assert.rejects(api.getLatestRelease());
   await assert.rejects(api.openRoot('root'));
   await assert.rejects(api.validateRelocation('root', ['source']));
   await assert.rejects(api.copyLocalFile('copy-1', 'source', 'root', {}, ['notes.pdf']));
   await assert.rejects(api.removeCopiedOriginal('remove-1', 'source', 'destination'));
   await assert.rejects(api.deleteFile('source'));
   assert.deepEqual(JSON.parse(JSON.stringify(calls.slice(1))), [
+    ['sakai:get-latest-release'],
     ['sakai:open-root', 'root'],
     ['sakai:validate-relocation', 'root', ['source']],
     ['sakai:copy-local-file', { id: 'copy-1', source: 'source', rootUri: 'root', resource: {}, segments: ['notes.pdf'] }],

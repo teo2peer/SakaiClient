@@ -8,6 +8,7 @@ const {
 const { DesktopNetwork } = require('./network.cjs');
 const { DesktopStorage, readBounded, regularFile, atomicWrite } = require('./storage.cjs');
 const { installProtocol } = require('./protocol.cjs');
+const { fetchLatestRelease } = require('./release.cjs');
 
 app.setName('Sakai Client');
 const testProfile = !app.isPackaged && process.argv.find((argument) => argument.startsWith('--sakai-test-profile='))?.slice('--sakai-test-profile='.length);
@@ -78,6 +79,7 @@ function handle(channel, callback) {
 function installBridge() {
   handle('sakai:request', (id, input) => network.request(id, input));
   handle('sakai:cancel', (id) => network.cancel(id));
+  handle('sakai:get-latest-release', () => fetchLatestRelease());
   handle('sakai:get-secret', (key) => storage.secret('get', key));
   handle('sakai:set-secret', (key, value) => storage.secret('set', key, value));
   handle('sakai:clear-secret', async (key) => {

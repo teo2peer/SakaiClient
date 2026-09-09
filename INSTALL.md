@@ -281,6 +281,6 @@ Do not publish an imported index without reviewing it. Exports exclude authentic
 
 ## After Installation
 
-Read [Usage](docs/USAGE.md) before choosing storage, signing in, importing data or enabling notifications. There is no automatic update channel: review each new release, verify its checksum, and repeat the applicable installation or signing process.
+Read [Usage](docs/USAGE.md) before choosing storage, signing in, importing data or enabling notifications. The app can indicate when a newer stable GitHub Release is available, but there is no automatic update channel: review each new release, verify its checksum, and repeat the applicable installation or signing process.
 
 For source builds and development prerequisites, use [Development](docs/DEVELOPMENT.md). Build success alone does not prove that signing, installation, folder providers, notifications or native rendering work on every device.

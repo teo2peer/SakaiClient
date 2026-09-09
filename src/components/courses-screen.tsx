@@ -18,6 +18,7 @@ import { ErrorBanner } from '@/components/error-banner';
 import { ScreenHeader } from '@/components/screen-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { VersionUpdateBanner } from '@/components/version-update-banner';
 import { usePaletteColors } from '@/hooks/use-palette';
 import { canMoveCourse, courseDisplayTitle, orderedCourses } from '@/lib/courses';
 import { buildResourceTree, resourceTreeSummary } from '@/lib/resource-tree';
@@ -222,6 +223,7 @@ export function LoginScreen() {
             </View>
           </View>
 
+          <VersionUpdateBanner />
           <ErrorBanner message={app.error} onDismiss={app.clearError} />
           <Card className="gap-4">
             <View className="gap-2">

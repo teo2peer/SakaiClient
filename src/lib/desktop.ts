@@ -19,7 +19,8 @@ export type DesktopResponse = {
 export type DesktopErrorCode =
   | 'INVALID_INPUT' | 'FORBIDDEN' | 'NOT_FOUND' | 'CANCELLED' | 'BUSY'
   | 'LIMIT_EXCEEDED' | 'NETWORK' | 'HTTP' | 'AUTH_REQUIRED' | 'REDIRECT'
-  | 'INVALID_DOCUMENT' | 'STORAGE' | 'SECURE_STORAGE_UNAVAILABLE' | 'UNSUPPORTED' | 'INTERNAL';
+  | 'INVALID_DOCUMENT' | 'STORAGE' | 'SECURE_STORAGE_UNAVAILABLE' | 'UNSUPPORTED'
+  | 'RELEASE_UNAVAILABLE' | 'INTERNAL';
 
 /** Plain rejection data: Electron does not preserve custom properties on Error instances. */
 export type DesktopError = {
@@ -34,6 +35,7 @@ export interface DesktopApi {
   readonly apiVersion: 1;
   request(id: string, input: DesktopRequest): Promise<DesktopResponse>;
   cancel(id: string): Promise<void>;
+  getLatestRelease(): Promise<unknown>;
   getSecret(key: DesktopSecretKey): Promise<string | null>;
   setSecret(key: DesktopSecretKey, value: string): Promise<void>;
   clearSecret(key: DesktopSecretKey): Promise<void>;

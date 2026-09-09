@@ -23,6 +23,7 @@ const MESSAGES = {
   STORAGE: 'Local storage is unavailable or could not be updated safely.',
   SECURE_STORAGE_UNAVAILABLE: 'An operating-system secret store is required to remember secrets.',
   UNSUPPORTED: 'This operation is not supported on this system.',
+  RELEASE_UNAVAILABLE: 'The latest release could not be checked.',
   INTERNAL: 'The desktop operation could not be completed.',
 };
 
